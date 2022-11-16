@@ -2,9 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use ZipArchive;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller {
+
+	public function home()
+	{
+		return view('home');
+	}
+
+	public function post(Request $request)
+	{	
+		$user = $request->user;
+		
+		foreach($request->file('file') as $file){
+            $name = $file->getClientOriginalName();
+            // $file->move('image',$name);
+			// Storage::disk('local')->put('public/upload/'.$user.'/'.$name, $file);
+			$target = storage_path('app/public/upload/'.$user);
+			if ( !is_dir( $target ) ) {
+				mkdir( $target, 777);
+			}
+			// return filesize( $file );
+			$compressedImage = $this->compressImage( $file, $target.'/'.$name, 40);
+
+        }
+
+		$zipname = $target.'.zip';
+		$zip = new ZipArchive;
+		$zip->open($zipname, ZipArchive::CREATE);
+		if ($handle = opendir($target)) {
+		  while (false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
+				// return $entry;
+				$zip->addFile(storage_path('app/public/upload/'.$user.'/'.$entry));
+			}
+		  }
+		  closedir($handle);
+		}
+	
+		$zip->close();
+	
+		header('Content-Type: application/zip');
+		header("Content-Disposition: attachment; filename=adcs.zip");
+		header('Content-Length: ' . filesize($zipname));
+		header("Location: ".storage_path('app/public/upload/'.$user.'').".zip");
+		
+	}
+
+	public function zipAndDownload($folderName)
+	{
+		$zipname = $folderName.'.zip';
+		$zip = new ZipArchive;
+		$zip->open($zipname, ZipArchive::CREATE);
+		if ($handle = opendir('.')) {
+		  while (false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
+				$zip->addFile($entry);
+			}
+		  }
+		  closedir($handle);
+		}
+	
+		$zip->close();
+	
+		header('Content-Type: application/zip');
+		header("Content-Disposition: attachment; filename='adcs.zip'");
+		header('Content-Length: ' . filesize($zipname));
+		header("Location: adcs.zip");
+	
+	}
 
 	public function compress( Request $request ) {
 		$rootFolder    = 'upload';

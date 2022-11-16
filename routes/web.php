@@ -14,4 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get( '/', [ImageController::class, 'compress'] );
+Route::get( '/', [ImageController::class, 'home'] );
+Route::post( '/post', [ImageController::class, 'post'] )->name('post');
+
+// Route::get( '/', [ImageController::class, 'compress'] );
