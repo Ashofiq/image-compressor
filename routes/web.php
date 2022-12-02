@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get( '/', [ImageController::class, 'home'] );
+Route::get( '/', [ImageController::class, 'home'] )->name('home');
 Route::post( '/post', [ImageController::class, 'post'] )->name('post');
+Route::get( '/resize', [ImageController::class, 'resize'] )->name('resizer');
+Route::post( '/resize', [ImageController::class, 'resizePost'] )->name('resizer.post');
+
+Route::get( '/api/tocken', [ImageController::class, 'tocken'] );
 
 // Route::get( '/', [ImageController::class, 'compress'] );
