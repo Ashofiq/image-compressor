@@ -2,41 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use ZipArchive;
 use Illuminate\Http\Request;
 use Image;
-use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class ImageController extends Controller {
 
-	public function home()
-	{
-		return view('pages.compress');
+	public function home() {
+		return view( 'pages.compress' );
 	}
 
-	public function resize()
-	{
-		return view('pages.resize');
+	public function resize() {
+		return view( 'pages.resize' );
 	}
 
-	public function post(Request $request)
-	{	
+	public function post( Request $request ) {
 		$user = $request->user;
-		if ($request->file('file') == null) {
+		if ( $request->file( 'file' ) == null ) {
 			return back();
 		}
-		
-		foreach($request->file('file') as $file){
-            $name = $file->getClientOriginalName();
-			$target = storage_path('app/public/upload/'.$user);
-			if ( !is_dir( $target ) ) {
-				mkdir( $target, 777);
-				chmod("$target", 0755);
-			}
-			$compressedImage = $this->compressImage( $file, $target.'/'.$name, 40);
-        }
 
-		$zipname = $target.'.zip';
+		foreach ( $request->file( 'file' ) as $file ) {
+			$name   = $file->getClientOriginalName();
+			$target = storage_path( 'app/public/upload/' . $user );
+			if ( !is_dir( $target ) ) {
+				mkdir( $target, 777 );
+				chmod( "$target", 0755 );
+			}
+			$compressedImage = $this->compressImage( $file, $target . '/' . $name, 40 );
+		}
+
+		$zipname = $target . '.zip';
 		// $zip = new ZipArchive;
 		// $zip->open($zipname, ZipArchive::CREATE);
 		// if ($handle = opendir($target)) {
@@ -48,57 +44,55 @@ class ImageController extends Controller {
 		//   }
 		//   closedir($handle);
 		// }
-	
+
 		// $zip->close();
-		$this->zipCreate($zipname, $target, $user);
-		$headers = ["Content-Type"=>"application/zip"];
-        $fileName = $user.".zip";
-		
+		$this->zipCreate( $zipname, $target, $user );
+		$headers  = ["Content-Type" => "application/zip"];
+		$fileName = $user . ".zip";
+
 		return response()
-        ->download(storage_path('app/public/upload/'.$user.'.zip'), $fileName, $headers)->deleteFileAfterSend(true);
-		
+			->download( storage_path( 'app/public/upload/' . $user . '.zip' ), $fileName, $headers )->deleteFileAfterSend( true );
+
 	}
 
-	public function zipCreate($sourceFolder, $target, $user)
-	{
+	public function zipCreate( $sourceFolder, $target, $user ) {
 		$zip = new ZipArchive;
-		$zip->open($sourceFolder, ZipArchive::CREATE);
-		if ($handle = opendir($target)) {
-		  while (false !== ($entry = readdir($handle))) {
-			if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
-				// return $entry;
-				$zip->addFile(storage_path('app/public/upload/'.$user.'/'.$entry), $entry);
+		$zip->open( $sourceFolder, ZipArchive::CREATE );
+		if ( $handle = opendir( $target ) ) {
+			while ( false !== ( $entry = readdir( $handle ) ) ) {
+				if ( $entry != "." && $entry != ".." && !strstr( $entry, '.php' ) ) {
+					// return $entry;
+					$zip->addFile( storage_path( 'app/public/upload/' . $user . '/' . $entry ), $entry );
+				}
 			}
-		  }
-		  closedir($handle);
+			closedir( $handle );
 		}
-	
+
 		$zip->close();
 
-		return $user.".zip";
+		return $user . ".zip";
 	}
 
-	public function zipAndDownload($folderName)
-	{
-		$zipname = $folderName.'.zip';
-		$zip = new ZipArchive;
-		$zip->open($zipname, ZipArchive::CREATE);
-		if ($handle = opendir('.')) {
-		  while (false !== ($entry = readdir($handle))) {
-			if ($entry != "." && $entry != ".." && !strstr($entry,'.php')) {
-				$zip->addFile($entry);
+	public function zipAndDownload( $folderName ) {
+		$zipname = $folderName . '.zip';
+		$zip     = new ZipArchive;
+		$zip->open( $zipname, ZipArchive::CREATE );
+		if ( $handle = opendir( '.' ) ) {
+			while ( false !== ( $entry = readdir( $handle ) ) ) {
+				if ( $entry != "." && $entry != ".." && !strstr( $entry, '.php' ) ) {
+					$zip->addFile( $entry );
+				}
 			}
-		  }
-		  closedir($handle);
+			closedir( $handle );
 		}
-	
+
 		$zip->close();
-	
-		header('Content-Type: application/zip');
-		header("Content-Disposition: attachment; filename='adcs.zip'");
-		header('Content-Length: ' . filesize($zipname));
-		header("Location: adcs.zip");
-	
+
+		header( 'Content-Type: application/zip' );
+		header( "Content-Disposition: attachment; filename='adcs.zip'" );
+		header( 'Content-Length: ' . filesize( $zipname ) );
+		header( "Location: adcs.zip" );
+
 	}
 
 	public function compress( Request $request ) {
@@ -195,41 +189,44 @@ class ImageController extends Controller {
 		return $b;
 	}
 
-	public function resizePost(Request $request)
-	{		
-		if ($request->file('file') == null) {
+	public function resizePost( Request $request ) {
+		if ( $request->file( 'file' ) == null ) {
 			return back();
 		}
-		
-		$this->validate($request, [
-            'width' => 'required|numeric',
-            'height' => 'required|numeric'
-        ]);
 
-		$user = $request->user;
-		$width = $request->width;
+		$this->validate( $request, [
+			'width'  => 'required|numeric',
+			'height' => 'required|numeric',
+		] );
+
+		$user   = $request->user;
+		$width  = $request->width;
 		$height = $request->height;
 		// return$request;
-		foreach($request->file('file') as $file){
-            $name = $file->getClientOriginalName();
-			$target = storage_path('app/public/upload/'.$user);
+		foreach ( $request->file( 'file' ) as $file ) {
+			$name   = $file->getClientOriginalName();
+			$target = storage_path( 'app/public/upload/' . $user );
 			if ( !is_dir( $target ) ) {
-				mkdir( $target, 777);
-				chmod("$target", 0755);
+				mkdir( $target, 777 );
+				chmod( "$target", 0755 );
 			}
-			$image_resize = Image::make($file->getRealPath());
-            $image_resize->resize($width,$height);        
-            $path = $target .'/'. $name;
-            $image_resize->save($path);
-        }
-		$zipname = $target.'.zip';
+			$image_resize = Image::make( $file->getRealPath() );
+			$image_resize->resize( $width, $height );
+			$path = $target . '/' . $name;
+			$image_resize->save( $path );
+		}
+		$zipname = $target . '.zip';
 
-		$this->zipCreate($zipname, $target, $user);
-		$headers = ["Content-Type"=>"application/zip"];
-        $fileName = $user.".zip";
-		
+		$this->zipCreate( $zipname, $target, $user );
+		$headers  = ["Content-Type" => "application/zip"];
+		$fileName = $user . ".zip";
+
 		return response()
-        ->download(storage_path('app/public/upload/'.$user.'.zip'), $fileName, $headers)->deleteFileAfterSend(true);
-		
+			->download( storage_path( 'app/public/upload/' . $user . '.zip' ), $fileName, $headers )->deleteFileAfterSend( true );
+
+	}
+
+	public function clippy() {
+		return view( 'pages.clippy' );
 	}
 }
