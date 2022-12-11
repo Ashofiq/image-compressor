@@ -1,6 +1,6 @@
 @extends('home')
 
-@section('title', 'Resize Image')
+@section('title', 'CSS Clip Path Maker')
 
 @section('content')
 
@@ -8,7 +8,7 @@
 		 	<div class="row">
 				<div class="col-md-8 card">
 				<div class="card-header">
-                      <h3 class="card-title">CSS Clip Path Macker</h3>
+                      <h3 class="card-title">CSS Clip Path Maker</h3>
                     </div>
 					<div class="demo-container fade-content">
 						<section class="demo">
