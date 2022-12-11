@@ -20,12 +20,10 @@
                 </div>
                 <div class="card-body">
                     
-                        <div class="row">
-                            <div class="col-3"></div>
-                            <div class="col-2 ps-5"><input name="width" type="text" class="form-control @error('width') is-invalid @enderror" value="{{ old('width') }}" placeholder="width"></div>
-                            <div class="col-2 text-center pt-2">X</div>
-                            <div class="col-2 pe-5"><input name="height" type="text" class="form-control @error('height') is-invalid @enderror" value="{{ old('height') }}" placeholder="height"></div>
-                            <div class="col-3"></div>
+                        <div class="row justify-content-center">
+                            <div class="col-sm-12 col-md-2"><input name="width" type="text" class="form-control @error('width') is-invalid @enderror" value="{{ old('width') }}" placeholder="width"></div>
+                            <div class="col-md-2 col-sm-12 text-center pt-2">X</div>
+                            <div class="col-sm-12 col-md-2"><input name="height" type="text" class="form-control @error('height') is-invalid @enderror" value="{{ old('height') }}" placeholder="height"></div>
                         </div>
                         <div class="upload__box">
                             <div class="upload__btn-box">
